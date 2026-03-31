@@ -490,16 +490,16 @@ export default async function Home() {
                 <p className="eyebrow">Latest Notes</p>
                 <span className="section-meta">↗</span>
               </div>
-            <div className="post-list">
-              {latestNotes.map((item) => (
-                <div className="post-row" key={item.title}>
-                  <div className="commit-copy">
-                    <span>{item.title}</span>
+              <div className="post-list">
+                {latestNotes.map((item) => (
+                  <div className="post-row post-row--note" key={item.title}>
+                    <div className="commit-copy commit-copy--note">
+                      <span>{item.title}</span>
+                      <span>{item.date}</span>
+                    </div>
                   </div>
-                  <span>{item.date}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </article>
           </div>
 

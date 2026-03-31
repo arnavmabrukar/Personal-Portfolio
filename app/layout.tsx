@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -45,7 +46,10 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${sans.variable} ${serif.variable} ${mono.variable}`}>{children}</body>
+      <body className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

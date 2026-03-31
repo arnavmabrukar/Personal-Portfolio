@@ -787,6 +787,10 @@ button {
   padding-top: 0;
 }
 
+.post-row--note {
+  display: block;
+}
+
 .post-row--experience {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -856,6 +860,19 @@ button {
   color: var(--text-muted);
   font-size: 0.75rem;
   line-height: 1.5;
+}
+
+.commit-copy--note {
+  gap: 0.2rem;
+}
+
+.commit-copy--note span:first-child {
+  color: var(--text-primary);
+}
+
+.commit-copy--note span:last-child {
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
 .commit-hash {
