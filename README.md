@@ -1,5 +1,10 @@
 # Arnav's Portfolio
 
+Live site:  
+https://arnavmabrukar.vercel.app
+
+![Portfolio Preview](./public/readme-preview.png)
+
 This is my personal portfolio website.
 
 It was built to be clean, minimal, and easy to navigate, with a focus on showing my projects, background, resume, and current work in a simple way.
@@ -43,17 +48,6 @@ public/
 - Appearance settings
 - Experience highlights
 - Recent GitHub activity
-
-## Running Locally
-
-```bash
-npm install
-npm run dev
-```
-
-Live site:
-
-`https://arnavmabrukar.vercel.app`
 
 ## Notes
 
