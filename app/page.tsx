@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Script from "next/script";
 import { AppearanceCard } from "@/components/appearance-card";
 import { TopbarBreadcrumb } from "@/components/topbar-breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -196,9 +197,47 @@ const latestNotes = [
 
 export default async function Home() {
   const featuredWork = await getPinnedProjects();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Arnav Mabrukar",
+    url: "https://arnavmabrukar.tech",
+    image: "https://arnavmabrukar.tech/arnav-portrait.png",
+    jobTitle: "AI & Full-Stack Engineer",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Randolph",
+      addressRegion: "New Jersey",
+      addressCountry: "US",
+    },
+    alumniOf: {
+      "@type": "CollegeOrUniversity",
+      name: "Rutgers University-New Brunswick",
+    },
+    sameAs: [
+      "https://github.com/arnavmabrukar",
+      "https://www.linkedin.com/in/arnav-mabrukar",
+    ],
+    knowsAbout: [
+      "Artificial Intelligence",
+      "Full-Stack Development",
+      "Next.js",
+      "React",
+      ".NET",
+      "Computer Vision",
+      "Machine Learning",
+    ],
+  };
 
   return (
     <main className="page-shell">
+      <Script
+        id="person-jsonld"
+        strategy="afterInteractive"
+        type="application/ld+json"
+      >
+        {JSON.stringify(jsonLd)}
+      </Script>
       <header className="topbar">
         <TopbarBreadcrumb />
         <nav className="topbar-nav" aria-label="Primary">
