@@ -13,7 +13,7 @@ const accents: Array<{ key: Accent; label: string }> = [
 
 export function AppearanceCard() {
   const [theme, setTheme] = useState<Theme>("dark");
-  const [accent, setAccent] = useState<Accent>("blue");
+  const [accent, setAccent] = useState<Accent>("peach");
 
   useEffect(() => {
     const root = document.documentElement;
@@ -22,7 +22,7 @@ export function AppearanceCard() {
     const nextAccent =
       root.dataset.accent === "pink" || root.dataset.accent === "blue"
         ? root.dataset.accent
-        : "blue";
+        : "peach";
     setAccent(nextAccent);
   }, []);
 

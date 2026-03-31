@@ -102,7 +102,7 @@ export default function RootLayout({
               const storedTheme = localStorage.getItem("theme");
               const storedAccent = localStorage.getItem("accent");
               const theme = storedTheme || "dark";
-              const accent = storedAccent || "blue";
+              const accent = storedAccent || "peach";
               document.documentElement.dataset.theme = theme;
               document.documentElement.dataset.accent = accent;
             })();

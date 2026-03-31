@@ -395,18 +395,11 @@ export default async function Home() {
               <section className="hero-meta" aria-label="Hero links and experience">
                 <div className="hero-links">
                   {heroLinks.map((link, index) => (
-                    <span
-                      className={`hero-links__item${
-                        link.label === "More about me" ? " hero-links__item--more" : ""
-                      }`}
-                      key={link.label}
-                    >
+                    <span className="hero-links__item" key={link.label}>
                       {index > 0 ? <span className="hero-links__sep">|</span> : null}
                       <a href={link.href}>
                         {link.label}
-                        {link.label === "More about me" ? (
-                          <span className="hero-links__arrow"> {"\u2192"}</span>
-                        ) : null}
+                        {link.label === "More about me" ? " →" : ""}
                       </a>
                     </span>
                   ))}
