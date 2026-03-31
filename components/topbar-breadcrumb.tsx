@@ -3,9 +3,18 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
+const sectionIds = [
+  "projects-section",
+  "contact-section",
+  "resume-download",
+  "appearance-settings",
+  "latest-section",
+];
+
 export function TopbarBreadcrumb() {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
+  const [activeSection, setActiveSection] = useState("");
   const routeName =
     pathname && pathname !== "/"
       ? pathname
@@ -25,7 +34,36 @@ export function TopbarBreadcrumb() {
     return () => window.removeEventListener("hashchange", updateHash);
   }, []);
 
-  const breadcrumbLabel = hash || routeName;
+  useEffect(() => {
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((element): element is HTMLElement => element !== null);
+
+    if (!elements.length) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visible[0]?.target?.id) {
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -55% 0px",
+        threshold: [0.15, 0.35, 0.6],
+      },
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  const breadcrumbLabel = hash || activeSection || routeName;
 
   return (
     <nav aria-label="Breadcrumb" className="topbar-brand">

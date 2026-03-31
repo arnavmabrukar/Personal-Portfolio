@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Script from "next/script";
 import { AppearanceCard } from "@/components/appearance-card";
+import { ResumeCard } from "@/components/resume-card";
 import { TopbarBreadcrumb } from "@/components/topbar-breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -10,6 +11,13 @@ type FeaturedProject = {
   meta: string;
   tags: string[];
   accent: string;
+  href?: string;
+};
+
+type RecentCommit = {
+  repo: string;
+  message: string;
+  date: string;
   href?: string;
 };
 
@@ -37,6 +45,19 @@ const featuredWorkFallback: FeaturedProject[] = [
     meta: "DivHacks / AR Developer / 2024",
     tags: ["ar", "lens studio", "education", "sustainability"],
     accent: "trip",
+  },
+];
+
+const recentCommitFallback: RecentCommit[] = [
+  {
+    repo: "Developer-Event-Booking-Site",
+    message: "Pinned GitHub project from my public profile.",
+    date: "GitHub feed unavailable",
+  },
+  {
+    repo: "Sentiment-Analysis-AI-WebApp",
+    message: "Recent commit activity will appear here automatically.",
+    date: "GitHub feed unavailable",
   },
 ];
 
@@ -110,6 +131,78 @@ async function getPinnedProjects(): Promise<FeaturedProject[]> {
   }
 }
 
+function formatCommitDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+async function getRecentCommits(): Promise<RecentCommit[]> {
+  try {
+    const response = await fetch("https://api.github.com/users/arnavmabrukar/events/public", {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "Mozilla/5.0",
+      },
+      next: { revalidate },
+    });
+
+    if (!response.ok) {
+      return recentCommitFallback;
+    }
+
+    const events = (await response.json()) as Array<{
+      type?: string;
+      created_at?: string;
+      repo?: { name?: string };
+      payload?: {
+        commits?: Array<{
+          sha?: string;
+          message?: string;
+          url?: string;
+        }>;
+      };
+    }>;
+
+    const seen = new Set<string>();
+    const commits: RecentCommit[] = [];
+
+    for (const event of events) {
+      if (event.type !== "PushEvent" || !event.payload?.commits?.length || !event.created_at) {
+        continue;
+      }
+
+      for (const commit of event.payload.commits) {
+        if (!commit.sha || !commit.message || seen.has(commit.sha)) {
+          continue;
+        }
+
+        seen.add(commit.sha);
+        commits.push({
+          repo: event.repo?.name?.split("/")[1] || event.repo?.name || "GitHub",
+          message: commit.message,
+          date: formatCommitDate(event.created_at),
+          href: commit.url
+            ? commit.url
+                .replace("api.github.com/repos", "github.com")
+                .replace("/commits/", "/commit/")
+            : undefined,
+        });
+
+        if (commits.length === 4) {
+          return commits;
+        }
+      }
+    }
+
+    return commits.length ? commits : recentCommitFallback;
+  } catch {
+    return recentCommitFallback;
+  }
+}
+
 const links = [
   {
     label: "Email",
@@ -156,10 +249,11 @@ const techStack = [
   "OpenAI APIs",
 ];
 const proofPoints = [
-  "Improved test coverage to 90%+ on .NET services",
-  "Worked across 100K+ lines of C#/.NET code",
-  "Secured $3,000 in NSF funding for a CV startup",
-  "Presented product work to 100+ business owners at CES",
+  "Improved test coverage to 90%+ on production .NET services",
+  "Worked across 100K+ lines of C#/.NET code in a real engineering environment",
+  "Built and shipped full-stack projects with React, Django, and AI integrations",
+  "Won Best Transportation Hack at HackRU for NJ Trip Planner",
+  "Presented startup product research to 100+ business owners at CES",
 ];
 const experienceHighlights = [
   {
@@ -188,15 +282,9 @@ const experienceHighlights = [
   },
 ];
 
-const latestNotes = [
-  { title: "Dean’s List, Fall 2025", date: "Recent" },
-  { title: "Tableau course completed", date: "Recent" },
-  { title: "Started ProgenyHealth internship", date: "2025" },
-  { title: "Presented startup research at CES", date: "2024" },
-];
-
 export default async function Home() {
   const featuredWork = await getPinnedProjects();
+  const recentCommits = await getRecentCommits();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -283,10 +371,18 @@ export default async function Home() {
           <div className="hero-layout">
             <div className="hero-copy">
               <h1>
-                Hey! I&apos;m <span>Arnav Mabrukar</span>
+                Hey! I&apos;m <span>Arnav Mabrukar</span>{" "}
+                <Image
+                  alt="Samurott sprite"
+                  className="hero-name-sprite"
+                  height={52}
+                  priority
+                  src="/samurott-sprite.png"
+                  width={52}
+                />
               </h1>
               <p className="hero-text">
-                I&apos;m currently a CS + DS Student @{" "}
+                I&apos;m currently a 4th year CS + DS Student @{" "}
                 <span>Rutgers University</span>. I&apos;ve built software across{" "}
                 <span>AI</span>, <span>full-stack</span>, <span>computer vision</span>,
                 {" "}and product engineering through <span>Rutgers</span>,{" "}
@@ -296,20 +392,18 @@ export default async function Home() {
                 AR, and computer vision workflows. I like building products people
                 actually use.
               </p>
-              <div className="hero-links">
-                {heroLinks.map((link, index) => (
-                  <span className="hero-links__item" key={link.label}>
-                    {index > 0 ? <span className="hero-links__sep">|</span> : null}
-                    <a
-                      href={link.href}
-                    >
-                      {link.label}
-                      {link.label === "More about me" ? " →" : ""}
-                    </a>
-                  </span>
-                ))}
-              </div>
-              <section className="hero-experience-section" aria-label="Experience summary">
+              <section className="hero-meta" aria-label="Hero links and experience">
+                <div className="hero-links">
+                  {heroLinks.map((link, index) => (
+                    <span className="hero-links__item" key={link.label}>
+                      {index > 0 ? <span className="hero-links__sep">|</span> : null}
+                      <a href={link.href}>
+                        {link.label}
+                        {link.label === "More about me" ? " →" : ""}
+                      </a>
+                    </span>
+                  ))}
+                </div>
                 <div className="hero-experience">
                   {experience.map((item, index) => (
                     <span className="hero-experience__item" key={item.label}>
@@ -364,7 +458,12 @@ export default async function Home() {
             <div className="section-intro">
               <p className="eyebrow">Selected work</p>
               <h2>Featured Projects</h2>
-              <a className="section-link" href="#contact-section">
+              <a
+                className="section-link"
+                href="https://github.com/arnavmabrukar?tab=repositories"
+                rel="noreferrer"
+                target="_blank"
+              >
                 View more
               </a>
             </div>
@@ -393,7 +492,11 @@ export default async function Home() {
                       item.title
                     )}
                   </h4>
-                  <p className="work-card__summary">{item.summary}</p>
+                  {item.href ? (
+                    <a className="work-card__action" href={item.href} rel="noreferrer" target="_blank">
+                      View project →
+                    </a>
+                  ) : null}
                   <div className="tag-list">
                     {item.tags.map((tag) => (
                       <span className="tag" key={tag}>
@@ -473,26 +576,7 @@ export default async function Home() {
                 </article>
 
                 <div className="identity-rail__bottom">
-                  <article className="info-card info-card--resume-rail">
-                    <div className="anchor-highlight" id="resume-download" />
-                    <p className="eyebrow">Resume</p>
-                    <a
-                      className="resume-link resume-link--rail"
-                      download="Arnav_Mabrukar_Resume.pdf"
-                      href="/Arnav_Mabrukar_Resume.pdf"
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      <span className="resume-link__icon" aria-hidden="true">
-                        <span className="resume-link__icon-fold" />
-                      </span>
-                      <span className="resume-link__copy">
-                        <strong>Download PDF</strong>
-                        <span>Internships, full-stack, AI roles</span>
-                      </span>
-                    </a>
-                  </article>
-
+                  <ResumeCard />
                   <AppearanceCard />
                 </div>
               </div>
@@ -526,14 +610,23 @@ export default async function Home() {
             <article className="info-card info-card--posts">
               <div className="anchor-highlight" id="latest-section" />
               <div className="section-intro">
-                <p className="eyebrow">Latest Notes</p>
+                <p className="eyebrow">Recent Commits</p>
                 <span className="section-meta">↗</span>
               </div>
               <div className="post-list">
-                {latestNotes.map((item) => (
-                  <div className="post-row post-row--note" key={item.title}>
+                {recentCommits.map((item) => (
+                  <div className="post-row post-row--note" key={`${item.repo}-${item.message}`}>
                     <div className="commit-copy commit-copy--note">
-                      <span>{item.title}</span>
+                      <span>
+                        {item.href ? (
+                          <a href={item.href} rel="noreferrer" target="_blank">
+                            {item.repo}
+                          </a>
+                        ) : (
+                          item.repo
+                        )}
+                      </span>
+                      <span>{item.message}</span>
                       <span>{item.date}</span>
                     </div>
                   </div>
