@@ -247,8 +247,8 @@ export default async function Home() {
                 Hey! I&apos;m <span>Arnav Mabrukar</span>
               </h1>
               <p className="hero-text">
-                I&apos;m currently working as a Software Developer Intern at{" "}
-                <span>ProgenyHealth</span>. I&apos;ve built software across{" "}
+                I&apos;m currently a CS + DS Student @{" "}
+                <span>Rutgers University</span>. I&apos;ve built software across{" "}
                 <span>AI</span>, <span>full-stack</span>, <span>computer vision</span>,
                 {" "}and product engineering through <span>Rutgers</span>,{" "}
                 <span>Sonadia</span>, <span>NSF I-Corps</span>, and hackathon teams.
@@ -270,47 +270,49 @@ export default async function Home() {
                   </span>
                 ))}
               </div>
-              <div className="hero-experience">
-                {experience.map((item, index) => (
-                  <span className="hero-experience__item" key={item.label}>
-                    {index > 0 ? <span className="hero-experience__sep">/</span> : null}
-                    {item.icon ? (
-                      <span className="hero-experience__icon" aria-hidden="true">
-                        {item.icon === "education" ? (
-                          <svg fill="none" viewBox="0 0 24 24">
-                            <path
-                              d="M3 9.5L12 5l9 4.5L12 14 3 9.5Z"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.5"
-                            />
-                            <path
-                              d="M7 11.5V15c0 .8 2.2 2 5 2s5-1.2 5-2v-3.5"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.5"
-                            />
-                          </svg>
-                        ) : (
-                          <svg fill="none" viewBox="0 0 24 24">
-                            <path
-                              d="M16 11a3 3 0 1 0 0-6a3 3 0 0 0 0 6ZM8 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6ZM8 19c-2.2 0-4 1-4 2.2V22h8v-.8C12 20 10.2 19 8 19ZM16 17c-1.9 0-3.5.8-4 1.8V22h8v-1.2c0-1.2-1.8-3.8-4-3.8Z"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.5"
-                            />
-                          </svg>
-                        )}
-                      </span>
-                    ) : null}
-                    <span>{item.label}</span>
-                    {item.meta ? <span className="hero-experience__meta">{item.meta}</span> : null}
-                  </span>
-                ))}
-              </div>
+              <section className="hero-experience-section" aria-label="Experience summary">
+                <div className="hero-experience">
+                  {experience.map((item, index) => (
+                    <span className="hero-experience__item" key={item.label}>
+                      {index > 0 ? <span className="hero-experience__sep">/</span> : null}
+                      {item.icon ? (
+                        <span className="hero-experience__icon" aria-hidden="true">
+                          {item.icon === "education" ? (
+                            <svg fill="none" viewBox="0 0 24 24">
+                              <path
+                                d="M3 9.5L12 5l9 4.5L12 14 3 9.5Z"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.5"
+                              />
+                              <path
+                                d="M7 11.5V15c0 .8 2.2 2 5 2s5-1.2 5-2v-3.5"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.5"
+                              />
+                            </svg>
+                          ) : (
+                            <svg fill="none" viewBox="0 0 24 24">
+                              <path
+                                d="M16 11a3 3 0 1 0 0-6a3 3 0 0 0 0 6ZM8 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6ZM8 19c-2.2 0-4 1-4 2.2V22h8v-.8C12 20 10.2 19 8 19ZM16 17c-1.9 0-3.5.8-4 1.8V22h8v-1.2c0-1.2-1.8-3.8-4-3.8Z"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.5"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                      ) : null}
+                      <span>{item.label}</span>
+                      {item.meta ? <span className="hero-experience__meta">{item.meta}</span> : null}
+                    </span>
+                  ))}
+                </div>
+              </section>
             </div>
           </div>
         </div>
