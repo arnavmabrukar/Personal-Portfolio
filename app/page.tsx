@@ -36,10 +36,11 @@ type FeaturedProject = {
   href?: string;
 };
 
-type RecentCommit = {
-  repo: string;
-  message: string;
-  date: string;
+type HackathonProject = {
+  title: string;
+  summary: string;
+  event: string;
+  location: string;
   href?: string;
 };
 
@@ -70,16 +71,29 @@ const featuredWorkFallback: FeaturedProject[] = [
   },
 ];
 
-const recentCommitFallback: RecentCommit[] = [
+const hackathonProjectsFallback: HackathonProject[] = [
   {
-    repo: "Developer-Event-Booking-Site",
-    message: "Pinned GitHub project from my public profile.",
-    date: "GitHub feed unavailable",
+    title: "Fawn",
+    summary:
+      "AI-powered daycare operations assistant handling parent calls, lead capture, scheduling, and real-time staff updates.",
+    event: "YHack Spring 2026",
+    location: "Yale University, New Haven, CT",
+    href: "https://devpost.com/software/fawn-v12jaw",
   },
   {
-    repo: "Sentiment-Analysis-AI-WebApp",
-    message: "Recent commit activity will appear here automatically.",
-    date: "GitHub feed unavailable",
+    title: "CookingMama",
+    summary:
+      "A grocery and recipe experience built to help college students shop more simply and plan meals more easily.",
+    event: "HackRU Spring 2024",
+    location: "College Avenue Student Center, New Brunswick, NJ",
+    href: "https://devpost.com/software/cookingmama",
+  },
+  {
+    title: "NJ Trip Planner",
+    summary: "AI-powered New Jersey travel guide and HackRU winner.",
+    event: "HackRU Fall 2023",
+    location: "Busch Student Center, Piscataway, NJ",
+    href: "https://devpost.com/software/nj-trip-planner",
   },
 ];
 
@@ -153,75 +167,106 @@ async function getPinnedProjects(): Promise<FeaturedProject[]> {
   }
 }
 
-function formatCommitDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
-}
+async function getHackathonProjects(): Promise<HackathonProject[]> {
+  async function getHackathonLocation(challengeUrl: string) {
+    try {
+      const response = await fetch(challengeUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+        },
+        next: { revalidate },
+      });
 
-async function getRecentCommits(): Promise<RecentCommit[]> {
+      if (!response.ok) {
+        return "";
+      }
+
+      const html = await response.text();
+      const streetAddressMatch = html.match(/"streetAddress":\s*"([^"]+)"/);
+
+      if (streetAddressMatch) {
+        return stripTags(streetAddressMatch[1]).replace(/,\s*USA$/, "");
+      }
+
+      const locationMatch = html.match(/maps\.google\.com\/\?q=[^"]+">([\s\S]*?)<\/a>/);
+      return locationMatch ? stripTags(locationMatch[1]) : "";
+    } catch {
+      return "";
+    }
+  }
+
   try {
-    const response = await fetch("https://api.github.com/users/arnavmabrukar/events/public", {
+    const response = await fetch("https://devpost.com/arnavmabrukar", {
       headers: {
-        Accept: "application/vnd.github+json",
         "User-Agent": "Mozilla/5.0",
       },
       next: { revalidate },
     });
 
     if (!response.ok) {
-      return recentCommitFallback;
+      return hackathonProjectsFallback;
     }
 
-    const events = (await response.json()) as Array<{
-      type?: string;
-      created_at?: string;
-      repo?: { name?: string };
-      payload?: {
-        commits?: Array<{
-          sha?: string;
-          message?: string;
-          url?: string;
-        }>;
-      };
-    }>;
+    const html = await response.text();
+    const projectCards = [
+      ...html.matchAll(
+        /<div class="large-3 small-12 columns gallery-item"[\s\S]*?<\/div><\/a>\s*<\/div>/g,
+      ),
+    ].slice(0, 3);
 
-    const seen = new Set<string>();
-    const commits: RecentCommit[] = [];
+    const parsedProjects = await Promise.all(
+      projectCards.map(async (match) => {
+        const itemHtml = match[0];
+        const hrefMatch = itemHtml.match(/href="([^"]+)"/);
+        const titleMatch = itemHtml.match(/<h5>\s*([\s\S]*?)\s*<\/h5>/);
+        const summaryMatch = itemHtml.match(/<p class="small tagline">\s*([\s\S]*?)\s*<\/p>/);
 
-    for (const event of events) {
-      if (event.type !== "PushEvent" || !event.payload?.commits?.length || !event.created_at) {
-        continue;
-      }
-
-      for (const commit of event.payload.commits) {
-        if (!commit.sha || !commit.message || seen.has(commit.sha)) {
-          continue;
+        if (!hrefMatch || !titleMatch || !summaryMatch) {
+          return null;
         }
 
-        seen.add(commit.sha);
-        commits.push({
-          repo: event.repo?.name?.split("/")[1] || event.repo?.name || "GitHub",
-          message: commit.message,
-          date: formatCommitDate(event.created_at),
-          href: commit.url
-            ? commit.url
-                .replace("api.github.com/repos", "github.com")
-                .replace("/commits/", "/commit/")
-            : undefined,
-        });
+        const projectUrl = hrefMatch[1];
+        let event = "Hackathon Project";
+        let location = "";
 
-        if (commits.length === 4) {
-          return commits;
+        try {
+          const projectResponse = await fetch(projectUrl, {
+            headers: {
+              "User-Agent": "Mozilla/5.0",
+            },
+            next: { revalidate },
+          });
+
+          if (projectResponse.ok) {
+            const projectHtml = await projectResponse.text();
+            const challengeHrefMatch = projectHtml.match(
+              /<div class="software-list-content">[\s\S]*?<a href="([^"]+)">([\s\S]*?)<\/a>/,
+            );
+
+            if (challengeHrefMatch) {
+              event = stripTags(challengeHrefMatch[2]);
+              location = await getHackathonLocation(challengeHrefMatch[1]);
+            }
+          }
+        } catch {
+          // Leave fallback event/location values when Devpost fetches fail.
         }
-      }
-    }
 
-    return commits.length ? commits : recentCommitFallback;
+        return {
+          title: stripTags(titleMatch[1]),
+          summary: stripTags(summaryMatch[1]),
+          event: itemHtml.includes("Winner") ? `${event} / Winner` : event,
+          location,
+          href: projectUrl,
+        };
+      }),
+    );
+
+    const projects = parsedProjects.filter(Boolean) as HackathonProject[];
+
+    return projects.length ? projects : hackathonProjectsFallback;
   } catch {
-    return recentCommitFallback;
+    return hackathonProjectsFallback;
   }
 }
 
@@ -310,7 +355,7 @@ const experienceHighlights = [
 
 export default async function Home() {
   const featuredWork = await getPinnedProjects();
-  const recentCommits = await getRecentCommits();
+  const hackathonProjects = await getHackathonProjects();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -360,31 +405,7 @@ export default async function Home() {
           <a href="#experience-section">Experience</a>
           <a href="#resume-download">Resume</a>
           <a href="#contact-section">Contact</a>
-          <a aria-label="Appearance settings" className="topbar-icon" href="#appearance-settings">
-            <svg
-              aria-hidden="true"
-              fill="none"
-              height="16"
-              viewBox="0 0 24 24"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 3.75a2.25 2.25 0 0 1 2.186 1.717l.094.398.221.904a1.5 1.5 0 0 0 1.18 1.111l.178.029.917.102a2.25 2.25 0 0 1 1.607 3.705l-.28.31-.625.678a1.5 1.5 0 0 0-.364 1.353l.045.174.24.887a2.25 2.25 0 0 1-3.02 2.691l-.368-.172-.84-.438a1.5 1.5 0 0 0-1.334-.057l-.166.078-.84.438a2.25 2.25 0 0 1-3.26-2.36l.08-.331.24-.887a1.5 1.5 0 0 0-.255-1.384l-.11-.143-.624-.678a2.25 2.25 0 0 1 1.196-3.753l.411-.057.917-.102a1.5 1.5 0 0 0 1.27-1.017l.05-.176.22-.904A2.25 2.25 0 0 1 12 3.75Z"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M12 14.25a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5Z"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </a>
+          <a href="#appearance-settings">Appearance</a>
         </nav>
         <ThemeToggle />
       </header>
@@ -542,26 +563,34 @@ export default async function Home() {
 
           <div className="utility-grid">
             <article className="info-card info-card--posts">
-              <div className="anchor-highlight" id="latest-section" />
+              <div className="anchor-highlight" id="hackathons-section" />
               <div className="section-intro">
-                <p className="eyebrow">Recent Commits</p>
-                <span className="section-meta">↗</span>
+                <p className="eyebrow">Hackathon Projects</p>
+                <a
+                  className="section-link"
+                  href="https://devpost.com/arnavmabrukar"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  View Devpost
+                </a>
               </div>
               <div className="post-list">
-                {recentCommits.map((item) => (
-                  <div className="post-row post-row--note" key={`${item.repo}-${item.message}`}>
+                {hackathonProjects.map((item) => (
+                  <div className="post-row post-row--note" key={`${item.title}-${item.event}`}>
                     <div className="commit-copy commit-copy--note">
                       <span>
                         {item.href ? (
                           <a href={item.href} rel="noreferrer" target="_blank">
-                            {item.repo}
+                            {item.title}
                           </a>
                         ) : (
-                          item.repo
+                          item.title
                         )}
                       </span>
-                      <span>{item.message}</span>
-                      <span>{item.date}</span>
+                      <span>{item.summary}</span>
+                      <span>{item.event}</span>
+                      {item.location ? <span>{item.location}</span> : null}
                     </div>
                   </div>
                 ))}
@@ -570,6 +599,7 @@ export default async function Home() {
 
             <div className="identity-cluster">
               <article className="info-card info-card--identity">
+                <div className="anchor-highlight" id="profile-section" />
                 <p className="eyebrow">Profile</p>
                 <div className="profile-widget">
                   <div className="profile-widget__avatar">

@@ -5,26 +5,29 @@ import { usePathname } from "next/navigation";
 
 const sectionIds = [
   "projects-section",
+  "profile-section",
   "experience-section",
   "contact-section",
   "resume-download",
   "appearance-settings",
-  "latest-section",
+  "hackathons-section",
 ];
 
 const sectionLabels: Record<string, string> = {
-  "projects-section": "selected work",
+  "projects-section": "projects",
+  "profile-section": "profile",
   "experience-section": "experience",
-  "contact-section": "let's connect",
+  "contact-section": "contact",
   "resume-download": "resume",
   "appearance-settings": "appearance",
-  "latest-section": "recent commits",
+  "hackathons-section": "hackathon projects",
 };
 
 export function TopbarBreadcrumb() {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
   const [activeSection, setActiveSection] = useState("");
+  const [isAtTop, setIsAtTop] = useState(true);
   const routeName =
     pathname && pathname !== "/"
       ? pathname
@@ -42,6 +45,16 @@ export function TopbarBreadcrumb() {
     updateHash();
     window.addEventListener("hashchange", updateHash);
     return () => window.removeEventListener("hashchange", updateHash);
+  }, []);
+
+  useEffect(() => {
+    function updateTopState() {
+      setIsAtTop(window.scrollY < 120);
+    }
+
+    updateTopState();
+    window.addEventListener("scroll", updateTopState, { passive: true });
+    return () => window.removeEventListener("scroll", updateTopState);
   }, []);
 
   useEffect(() => {
@@ -64,7 +77,7 @@ export function TopbarBreadcrumb() {
         }
       },
       {
-        rootMargin: "-20% 0px -55% 0px",
+        rootMargin: "-18% 0px -52% 0px",
         threshold: [0.15, 0.35, 0.6],
       },
     );
@@ -74,7 +87,7 @@ export function TopbarBreadcrumb() {
   }, []);
 
   const breadcrumbLabel =
-    sectionLabels[hash] || sectionLabels[activeSection] || routeName;
+    isAtTop ? "" : sectionLabels[hash] || sectionLabels[activeSection] || routeName;
 
   return (
     <nav aria-label="Breadcrumb" className="topbar-brand">
