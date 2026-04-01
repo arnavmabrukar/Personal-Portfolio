@@ -657,56 +657,6 @@ button.resume-link {
   line-height: 1.45;
 }
 
-.resume-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.resume-modal__panel {
-  width: min(980px, 100%);
-  height: min(88vh, 980px);
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--surface);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-
-.resume-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.resume-modal__close {
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-  background: var(--surface-soft);
-  color: var(--text-primary);
-  padding: 0.45rem 0.7rem;
-  cursor: pointer;
-}
-
-.resume-modal__frame {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: #ffffff;
-}
-
 .profile-widget {
   display: grid;
   gap: 0.85rem;
@@ -733,34 +683,40 @@ button.resume-link {
   font-size: 1rem;
 }
 
-.profile-location {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.45rem;
+.profile-meta {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
   color: var(--text-muted);
   font-size: 0.75rem;
 }
 
-.profile-location__pin {
-  position: relative;
-  width: 0.6rem;
-  height: 0.6rem;
-  border: 1.5px solid var(--accent);
-  border-radius: 999px 999px 999px 0;
-  transform: rotate(-45deg);
+.profile-meta__row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.35;
 }
 
-.profile-location__pin::after {
-  content: "";
-  position: absolute;
-  inset: 0.14rem;
-  border-radius: 999px;
-  background: var(--accent);
+.profile-meta__icon {
+  display: inline-flex;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.profile-meta__icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .widget-copy {
   margin: 0.35rem 0 0;
+}
+
+.profile-widget__description {
+  margin-top: 0.85rem;
 }
 
 .appearance-group + .appearance-group {
@@ -1185,14 +1141,6 @@ button.resume-link {
     text-align: left;
   }
 
-  .resume-modal {
-    padding: 0.75rem;
-  }
-
-  .resume-modal__panel {
-    height: min(92vh, 980px);
-  }
-
   .site-footer {
     flex-direction: column;
     align-items: flex-start;
@@ -1292,7 +1240,4 @@ button.resume-link {
     height: 5.75rem;
   }
 
-  .resume-modal__header {
-    padding: 0.8rem 0.9rem;
-  }
 }

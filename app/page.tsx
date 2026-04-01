@@ -4,6 +4,28 @@ import { AppearanceCard } from "@/components/appearance-card";
 import { ResumeCard } from "@/components/resume-card";
 import { TopbarBreadcrumb } from "@/components/topbar-breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
+const date = new Date();
+
+const profileTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "America/New_York",
+});
+
+function formatProfileTime(value: Date) {
+  const time = profileTimeFormatter.format(value);
+  const offset =
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      timeZoneName: "longOffset",
+    })
+      .formatToParts(value)
+      .find((part) => part.type === "timeZoneName")
+      ?.value.replace(/^GMT([+-])/, "UTC $1") ?? "UTC";
+
+  return `${time} (${offset})`;
+}
 
 type FeaturedProject = {
   title: string;
@@ -554,13 +576,47 @@ export default async function Home() {
                     />
                   </div>
                   <div className="profile-widget__copy">
-                    <h2>Arnav</h2>
+                    <h2>Arnav Mabrukar</h2>
                     <p className="widget-copy">AI &amp; Full-Stack Engineer</p>
-                    <div className="profile-location">
-                      <span className="profile-location__pin" aria-hidden="true" />
-                      <span>Randolph, New Jersey</span>
+                    <div className="profile-meta" aria-label="Profile location and local time">
+                      <div className="profile-meta__row">
+                        <span className="profile-meta__icon" aria-hidden="true">
+                          <svg fill="none" viewBox="0 0 24 24">
+                            <path
+                              d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.8"
+                            />
+                            <circle cx="12" cy="10" r="2.2" fill="currentColor" />
+                          </svg>
+                        </span>
+                        <span>New Jersey</span>
+                      </div>
+                      <div className="profile-meta__row">
+                        <span className="profile-meta__icon" aria-hidden="true">
+                          <svg fill="none" viewBox="0 0 24 24">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="8"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                            />
+                            <path
+                              d="M12 7.5v5l3 1.8"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.8"
+                            />
+                          </svg>
+                        </span>
+                        <span>{formatProfileTime(date)}</span>
+                      </div>
                     </div>
-                    <p className="widget-copy">
+                    <p className="widget-copy profile-widget__description">
                       Rutgers CS + DS senior building AI apps and production systems,
                       active in IEEE AI/ML, JCC, and bodybuilding while diving deeper
                       into LLMs, advanced deep learning, Japanese, and lifting.
