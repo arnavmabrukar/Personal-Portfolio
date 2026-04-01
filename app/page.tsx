@@ -77,7 +77,7 @@ const hackathonProjectsFallback: HackathonProject[] = [
     summary:
       "AI-powered daycare operations assistant handling parent calls, lead capture, scheduling, and real-time staff updates.",
     event: "YHack Spring 2026",
-    location: "Yale University, New Haven, CT",
+    location: "Yale University",
     href: "https://devpost.com/software/fawn-v12jaw",
   },
   {
@@ -85,14 +85,14 @@ const hackathonProjectsFallback: HackathonProject[] = [
     summary:
       "A grocery and recipe experience built to help college students shop more simply and plan meals more easily.",
     event: "HackRU Spring 2024",
-    location: "College Avenue Student Center, New Brunswick, NJ",
+    location: "Rutgers University",
     href: "https://devpost.com/software/cookingmama",
   },
   {
     title: "NJ Trip Planner",
     summary: "AI-powered New Jersey travel guide and HackRU winner.",
     event: "HackRU Fall 2023",
-    location: "Busch Student Center, Piscataway, NJ",
+    location: "Rutgers University",
     href: "https://devpost.com/software/nj-trip-planner",
   },
 ];
@@ -185,11 +185,36 @@ async function getHackathonProjects(): Promise<HackathonProject[]> {
       const streetAddressMatch = html.match(/"streetAddress":\s*"([^"]+)"/);
 
       if (streetAddressMatch) {
-        return stripTags(streetAddressMatch[1]).replace(/,\s*USA$/, "");
+        const normalizedAddress = stripTags(streetAddressMatch[1]);
+
+        if (normalizedAddress.includes("Yale")) {
+          return "Yale University";
+        }
+
+        if (normalizedAddress.includes("Rutgers")) {
+          return "Rutgers University";
+        }
+
+        return normalizedAddress.split(",")[0];
       }
 
       const locationMatch = html.match(/maps\.google\.com\/\?q=[^"]+">([\s\S]*?)<\/a>/);
-      return locationMatch ? stripTags(locationMatch[1]) : "";
+
+      if (!locationMatch) {
+        return "";
+      }
+
+      const venue = stripTags(locationMatch[1]);
+
+      if (venue.includes("Yale")) {
+        return "Yale University";
+      }
+
+      if (venue.includes("Student Center")) {
+        return "Rutgers University";
+      }
+
+      return venue;
     } catch {
       return "";
     }
