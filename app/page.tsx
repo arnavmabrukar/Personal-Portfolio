@@ -263,6 +263,7 @@ const experience: ExperienceChip[] = [
 const techStack = [
   "React",
   "Next.js",
+  "Java",
   "Django REST",
   ".NET / C#",
   "PyTorch",
@@ -331,6 +332,7 @@ export default async function Home() {
     knowsAbout: [
       "Artificial Intelligence",
       "Full-Stack Development",
+      "Java",
       "Next.js",
       "React",
       ".NET",
