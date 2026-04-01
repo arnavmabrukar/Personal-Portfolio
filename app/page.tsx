@@ -261,15 +261,18 @@ const experience: ExperienceChip[] = [
   { label: "IEEE AI/ML", icon: "community" },
 ];
 const techStack = [
-  "React",
-  "Next.js",
+  "Python",
   "Java",
-  "Django REST",
+  "TypeScript",
+  "React",
   ".NET / C#",
-  "PyTorch",
   "Docker",
-  "PostgreSQL",
-  "OpenAI APIs",
+  "SQL",
+  "Azure",
+  "Next.js",
+  "Django REST",
+  "PyTorch",
+  "Computer Vision",
 ];
 const proofPoints = [
   "Improved test coverage to 90%+ on production .NET services",
@@ -353,12 +356,9 @@ export default async function Home() {
       <header className="topbar">
         <TopbarBreadcrumb />
         <nav className="topbar-nav" aria-label="Primary">
-          <a href="#contact-section">About</a>
-          <a href="#latest-section">Notes</a>
           <a href="#projects-section">Projects</a>
-          <a href="#resume-download">
-            Resume
-          </a>
+          <a href="#experience-section">Experience</a>
+          <a href="#resume-download">Resume</a>
           <a href="#contact-section">Contact</a>
           <a aria-label="Appearance settings" className="topbar-icon" href="#appearance-settings">
             <svg
@@ -541,25 +541,30 @@ export default async function Home() {
           </article>
 
           <div className="utility-grid">
-            <article className="info-card info-card--stack">
-              <p className="eyebrow">Tech Stack</p>
-              <h2>Tools I use across AI and product engineering.</h2>
-              <div className="tag-list tag-list--stack">
-                {techStack.map((item) => (
-                  <span className="tag" key={item}>
-                    {item}
-                  </span>
-                ))}
+            <article className="info-card info-card--posts">
+              <div className="anchor-highlight" id="latest-section" />
+              <div className="section-intro">
+                <p className="eyebrow">Recent Commits</p>
+                <span className="section-meta">↗</span>
               </div>
-              <div className="stack-proof">
-                <p className="stack-proof__label">Proof Points</p>
-                <div className="proof-list proof-list--compact">
-                  {proofPoints.slice(0, 3).map((item) => (
-                    <div className="proof-row" key={item}>
-                      {item}
+              <div className="post-list">
+                {recentCommits.map((item) => (
+                  <div className="post-row post-row--note" key={`${item.repo}-${item.message}`}>
+                    <div className="commit-copy commit-copy--note">
+                      <span>
+                        {item.href ? (
+                          <a href={item.href} rel="noreferrer" target="_blank">
+                            {item.repo}
+                          </a>
+                        ) : (
+                          item.repo
+                        )}
+                      </span>
+                      <span>{item.message}</span>
+                      <span>{item.date}</span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </article>
 
@@ -620,8 +625,10 @@ export default async function Home() {
                     </div>
                     <p className="widget-copy profile-widget__description">
                       Rutgers CS + DS senior building AI apps and production systems,
-                      active in IEEE AI/ML, JCC, and bodybuilding while diving deeper
-                      into LLMs, advanced deep learning, Japanese, and lifting.
+                      active in IEEE AI/ML while diving deeper into LLMs and
+                      advanced deep learning.
+                      <span className="profile-widget__description-break" aria-hidden="true" />
+                      Learning Japanese and staying consistent with lifting outside of code.
                     </p>
                   </div>
                 </div>
@@ -651,6 +658,7 @@ export default async function Home() {
           </div>
 
           <div className="bottom-grid">
+            <div className="anchor-highlight" id="experience-section" />
             <article className="info-card info-card--experience">
               <div className="section-intro">
                 <p className="eyebrow">Experience Highlights</p>
@@ -674,30 +682,25 @@ export default async function Home() {
               </div>
             </article>
 
-            <article className="info-card info-card--posts">
-              <div className="anchor-highlight" id="latest-section" />
-              <div className="section-intro">
-                <p className="eyebrow">Recent Commits</p>
-                <span className="section-meta">↗</span>
-              </div>
-              <div className="post-list">
-                {recentCommits.map((item) => (
-                  <div className="post-row post-row--note" key={`${item.repo}-${item.message}`}>
-                    <div className="commit-copy commit-copy--note">
-                      <span>
-                        {item.href ? (
-                          <a href={item.href} rel="noreferrer" target="_blank">
-                            {item.repo}
-                          </a>
-                        ) : (
-                          item.repo
-                        )}
-                      </span>
-                      <span>{item.message}</span>
-                      <span>{item.date}</span>
-                    </div>
-                  </div>
+            <article className="info-card info-card--stack">
+              <p className="eyebrow">Tech Stack</p>
+              <h2>Tools I use across AI and product engineering.</h2>
+              <div className="tag-list tag-list--stack">
+                {techStack.map((item) => (
+                  <span className="tag" key={item}>
+                    {item}
+                  </span>
                 ))}
+              </div>
+              <div className="stack-proof">
+                <p className="stack-proof__label">Proof Points</p>
+                <div className="proof-list proof-list--compact">
+                  {proofPoints.slice(0, 3).map((item) => (
+                    <div className="proof-row" key={item}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
               </div>
             </article>
           </div>

@@ -5,11 +5,21 @@ import { usePathname } from "next/navigation";
 
 const sectionIds = [
   "projects-section",
+  "experience-section",
   "contact-section",
   "resume-download",
   "appearance-settings",
   "latest-section",
 ];
+
+const sectionLabels: Record<string, string> = {
+  "projects-section": "selected work",
+  "experience-section": "experience",
+  "contact-section": "let's connect",
+  "resume-download": "resume",
+  "appearance-settings": "appearance",
+  "latest-section": "recent commits",
+};
 
 export function TopbarBreadcrumb() {
   const pathname = usePathname();
@@ -63,7 +73,8 @@ export function TopbarBreadcrumb() {
     return () => observer.disconnect();
   }, []);
 
-  const breadcrumbLabel = hash || activeSection || routeName;
+  const breadcrumbLabel =
+    sectionLabels[hash] || sectionLabels[activeSection] || routeName;
 
   return (
     <nav aria-label="Breadcrumb" className="topbar-brand">
