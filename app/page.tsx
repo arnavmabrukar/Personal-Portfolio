@@ -530,7 +530,7 @@ export default async function Home() {
               <div className="stack-proof">
                 <p className="stack-proof__label">Proof Points</p>
                 <div className="proof-list proof-list--compact">
-                  {proofPoints.slice(0, 2).map((item) => (
+                  {proofPoints.slice(0, 3).map((item) => (
                     <div className="proof-row" key={item}>
                       {item}
                     </div>
@@ -561,7 +561,9 @@ export default async function Home() {
                       <span>Randolph, New Jersey</span>
                     </div>
                     <p className="widget-copy">
-                      Senior at Rutgers studying Computer Science and Data Science.
+                      Rutgers CS + DS senior building AI apps and production systems,
+                      active in IEEE AI/ML, JCC, and bodybuilding while diving deeper
+                      into LLMs, advanced deep learning, Japanese, and lifting.
                     </p>
                   </div>
                 </div>
